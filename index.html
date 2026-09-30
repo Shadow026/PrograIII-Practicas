@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -64,31 +64,18 @@
             </div>
             <div class="col-6">
                 <form id="frmConsultarCliente">
-
                     <div class="container text-center">
-
                         <div class="row">
-
                             <div class="col">
-
                                 <div class="table-responsive">
-
                                     <table class="table table-striped table-hover">
-
                                         <thead>
-
                                             <tr>
-
                                                 <th colspan="7">
-
                                                     <input type="search" placeholder="buscar por codigo o nombre"
                                                         id="txtBuscarCliente" name="txtBuscarCliente"
                                                         class="form-control">
-
-
-
                                                 </th>
-
                                             </tr>
                                             <tr>
                                                 <th>codigo</th>
@@ -98,133 +85,392 @@
                                                 <th>email</th>
                                                 <th>tipo</th>
                                                 <th></th>
-
                                             </tr>
-
                                         </thead>
-
+                                        <tbody id="tbodyClientes"></tbody>
                                     </table>
-
                                 </div>
-
                             </div>
-
                         </div>
-
-                        <div class="row">
-
-                            <div class="col">
-
-
-                            </div>
-
-                        </div>
-
                     </div>
-
                 </form>
             </div>
         </div>
+
+        <!-- ============ SECCIÓN PERÍODOS ============ -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h4 class="text-center">Impuesto a las Actividades Económicas — Períodos</h4>
+            </div>
+
+            <!-- Formulario -->
+            <div class="col-6">
+                <form id="frmPeriodo">
+                    <div class="container text-center">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <select class="form-control" id="cboClienteEmpresa" required>
+                                    <option value="">-- Cliente empresa --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <select class="form-control" id="cboProducto" required>
+                                    <option value="">-- Producto --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <input type="date" class="form-control" id="txtDesde" required>
+                            </div>
+                            <div class="col">
+                                <input type="date" class="form-control" id="txtHasta" required>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <input type="number" step="0.01" min="0.01" placeholder="Balance / Activo"
+                                    class="form-control" id="txtMonto" required>
+                            </div>
+                            <div class="col">
+                                <input type="number" step="0.01" value="1" placeholder="Cantidad"
+                                    class="form-control" id="txtCantidad">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <input type="button" value="Calcular" class="btn btn-info"
+                                    id="btnCalcularPeriodo">
+                                <input type="submit" value="Guardar" class="btn btn-primary">
+                                <input type="reset" value="Limpiar" class="btn btn-warning">
+                            </div>
+                        </div>
+                        <div class="alert alert-secondary text-start" id="detalleCalculo">
+                            Complete los datos y presione <b>Calcular</b>.
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabla -->
+            <div class="col-6">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Desde</th><th>Hasta</th><th>Balance</th>
+                                <th>Producto</th><th>Precio mensual</th><th>Estado</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPeriodos"></tbody>
+                        <tfoot>
+                            <tr><th colspan="4">Impuesto mensual vigente</th><th colspan="3" id="lblVigente">-</th></tr>
+                            <tr><th colspan="4">Total referencial de períodos registrados</th><th colspan="3" id="lblTotalReferencial">-</th></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-</body>
-<script>
-    var accion = 'nuevo',
-        idCliente = '';
 
-    frmCliente.addEventListener('submit', (e) => {
-        e.preventDefault();
-        guardarClientes();
+    <!-- =============================================================
+         SCRIPT 1 — CLIENTES
+         ============================================================= -->
+    <script>
+        var accion = 'nuevo', idCliente = '';
 
-    });
-    frmCliente.addEventListener('reset', (e) => {
-        e.preventDefault();
-        limpiarFormulario();
-    });
-    document.addEventListener("DOMContentLoaded", obtenerClientes());
-
-    async function obtenerClientes() {
-        let response = await fetch('/clientes'),
-            datos = await response.json();
-
-        mostrarDatos(datos);
-    }
-    function mostrarDatos(datos) {
-
-        let filas = "";
-        datos.array.forEach(e => {
-            filas += `
-            <tr>
-                <td>${e.codigo}</td>
-                <td>${e.nombre}</td>
-                <td>${e.direccion}</td>
-                <td>${e.telefono}</td>
-                <td>${e.email}</td>
-                <td>${e.tipo}</td>
-                <td>
-                    <input onClick= 'eliminarCliente('${JSON.stringify(e)}')" class='btn btn-danger' type= "button" value ="Eliminar">
-                    <input onClick= 'modificarCliente()' class='btn btn-warning' type= "button" value ="Modificar">
-                </td>
-            </tr>
-            `
+        frmCliente.addEventListener('submit', (e) => {
+            e.preventDefault();
+            guardarClientes();
         });
-    }
-function eliminarCliente(data, event) {
-    event.preventDefault();
-    if(confirm('?seguro de eliminar  el cliente: ${data.nombre}'))
-        idCliente= data.idCliente;
-    guardarClientes();
-    
-}
+        frmCliente.addEventListener('reset', (e) => {
+            e.preventDefault();
+            limpiarFormulario();
+        });
+        frmConsultarCliente.addEventListener('submit', (e) => e.preventDefault());
+        txtBuscarCliente.addEventListener('keyup', obtenerClientes);
+        document.addEventListener('DOMContentLoaded', obtenerClientes);
 
-
-function modificarCliente(data,event) {
-    event.preventDefault();
-    idCliente = data.idCliente;
-    accion = "modificar";
-
-    txtCodigoCliente.value = data.codigo;
-    txtNombreCliente.value = data.nombre;
-    txtDireccionCliente.value = data.telefono;
-    txtEmailCliente.value = data.email;
-    cboTipoPersona.value = data.tipo;
-    
-}
-    async function guardarClientes() {
-        let datos = {
-            codigo: txtCodigoCliente.value,
-            nombre: txtNombreCliente.value,
-            direccion: txtDireccionCliente.value,
-            telefono: txtTelefonoCliente.value,
-            email: txtEmailCliente.value,
-            tipo: cboTipoPersona.value,
-            accion,
-            idCliente
-        };
-        let response = await fetch('/cliente', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        }), respuesta = response.json();
-        if (respuesta.msg != "ok") {
-            alert("Error: " + respuesta.msg);
-            return;
+        async function obtenerClientes() {
+            let response = await fetch('/clientes?buscar=' + encodeURIComponent(txtBuscarCliente.value));
+            let datos = await response.json();
+            mostrarDatos(datos);
         }
-        limpiarFormulario();
-    }
-    function limpiarFormulario() {
-        accion = 'nuevo';
-        idCliente = '';
-        txtCodigoCliente.value = '';
-        txtNombreCliente.value = '';
-        txtDireccionCliente.value = '';
-        txtTelefonoCliente.value = '';
-        txtEmailCliente.value = '';
-        cboTipoPersona.value = 'particular';
-    }
 
+        function mostrarDatos(datos) {
+            tbodyClientes.innerHTML = '';
+            datos.forEach(c => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.codigo ?? ''}</td>
+                    <td>${c.nombre ?? ''}</td>
+                    <td>${c.direccion ?? ''}</td>
+                    <td>${c.telefono ?? ''}</td>
+                    <td>${c.email ?? ''}</td>
+                    <td>${c.tipo ?? ''}</td>
+                    <td></td>`;
 
-</script>
+                let btnEliminar = document.createElement('input');
+                btnEliminar.type = 'button';
+                btnEliminar.value = 'Eliminar';
+                btnEliminar.className = 'btn btn-danger';
+                btnEliminar.addEventListener('click', () => eliminarCliente(c));
+
+                let btnModificar = document.createElement('input');
+                btnModificar.type = 'button';
+                btnModificar.value = 'Modificar';
+                btnModificar.className = 'btn btn-warning';
+                btnModificar.addEventListener('click', () => modificarCliente(c));
+
+                tr.lastElementChild.append(btnEliminar, btnModificar);
+                tbodyClientes.appendChild(tr);
+            });
+        }
+
+        async function eliminarCliente(data) {
+            if (!confirm(`¿Seguro de eliminar el cliente: ${data.nombre}?`)) return;
+            idCliente = data.idCliente;
+            accion = 'eliminar';
+            await guardarClientes();
+        }
+
+        function modificarCliente(data) {
+            idCliente = data.idCliente;
+            accion = 'modificar';
+            txtCodigoCliente.value = data.codigo;
+            txtNombreCliente.value = data.nombre;
+            txtDireccionCliente.value = data.direccion;
+            txtTelefonoCliente.value = data.telefono;
+            txtEmailCliente.value = data.email;
+            cboTipoPersona.value = data.tipo;
+        }
+
+        async function guardarClientes() {
+            let datos = {
+                codigo: txtCodigoCliente.value,
+                nombre: txtNombreCliente.value,
+                direccion: txtDireccionCliente.value,
+                telefono: txtTelefonoCliente.value,
+                email: txtEmailCliente.value,
+                tipo: cboTipoPersona.value,
+                accion,
+                idCliente
+            };
+            let response = await fetch('/cliente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            let respuesta = await response.json();
+            if (respuesta.msg != 'ok') {
+                alert('Error: ' + respuesta.msg);
+                limpiarFormulario();
+                return;
+            }
+            limpiarFormulario();
+            obtenerClientes();
+            cargarClientesEmpresa();
+        }
+
+        function limpiarFormulario() {
+            accion = 'nuevo';
+            idCliente = '';
+            txtCodigoCliente.value = '';
+            txtNombreCliente.value = '';
+            txtDireccionCliente.value = '';
+            txtTelefonoCliente.value = '';
+            txtEmailCliente.value = '';
+            cboTipoPersona.value = 'particular';
+        }
+    </script>
+
+    <!-- =============================================================
+         SCRIPT 2 — PERÍODOS
+         ============================================================= -->
+    <script>
+        var ultimoCalculo = null;
+        const dinero = n => '$' + Number(n).toFixed(2);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarClientesEmpresa();
+            cargarProductos();
+        });
+
+        frmPeriodo.addEventListener('submit', e => {
+            e.preventDefault();
+            guardarPeriodo();
+        });
+
+        frmPeriodo.addEventListener('reset', () => {
+            limpiarPeriodo();
+        });
+
+        btnCalcularPeriodo.addEventListener('click', calcularPeriodo);
+
+        cboClienteEmpresa.addEventListener('change', () => {
+            if (cboClienteEmpresa.value) cargarPeriodos(cboClienteEmpresa.value);
+            calcularPeriodo();
+        });
+
+        cboProducto.addEventListener('change', calcularPeriodo);
+        txtDesde.addEventListener('change', calcularPeriodo);
+        txtMonto.addEventListener('input', calcularPeriodo);
+
+        async function cargarClientesEmpresa() {
+            let r = await fetch('/clientes-empresa');
+            let seleccionado = cboClienteEmpresa.value;
+            cboClienteEmpresa.innerHTML = '<option value="">-- Cliente empresa --</option>';
+            let datos = await r.json();
+            datos.forEach(c => {
+                let opt = document.createElement('option');
+                opt.value = c.idCliente;
+                opt.textContent = `${c.codigo} - ${c.nombre}`;
+                cboClienteEmpresa.appendChild(opt);
+                if (opt.value == seleccionado) cboClienteEmpresa.value = seleccionado;
+            });
+        }
+
+        async function cargarProductos() {
+            let r = await fetch('/productos');
+            let datos = await r.json();
+            datos.forEach(p => {
+                let opt = document.createElement('option');
+                opt.value = p.idProducto;
+                opt.textContent = `${p.codigo} - ${p.nombre}`;
+                cboProducto.appendChild(opt);
+            });
+        }
+
+        async function calcularPeriodo() {
+            let datos = {
+                idCliente: cboClienteEmpresa.value,
+                idProducto: cboProducto.value,
+                monto: txtMonto.value,
+                desde: txtDesde.value
+            };
+            if (!datos.idProducto || !datos.monto || !datos.desde) {
+                detalleCalculo.innerHTML = 'Complete producto, balance y fecha Desde.';
+                return;
+            }
+            let r = await fetch('/periodo/calcular', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            let res = await r.json();
+            ultimoCalculo = res;
+
+            if (res.msg !== 'ok') {
+                detalleCalculo.innerHTML = `<div class="text-danger">${res.msg}</div>`;
+                return;
+            }
+            detalleCalculo.innerHTML = `
+                <b>Fórmula:</b> ${res.formula}<br>
+                <b>Balance:</b> ${txtMonto.value}<br>
+                <b>Rango:</b> ${dinero(res.tarifaDesde)} - ${dinero(res.tarifaHasta)}<br>
+                <b>Precio base:</b> ${dinero(res.precioBase)}<br>
+                <b>Excedente:</b> ${dinero(res.excedente)}<br>
+                <b>Bloques:</b> ${res.bloques}<br>
+                <b>Adicional:</b> ${dinero(res.adicional)}<br>
+                <b>%:</b> ${res.porcentaje}<br>
+                <b class="text-success">Impuesto mensual: ${dinero(res.precioMensual)}</b>
+                ${res.aviso ? `<div class="text-warning mt-2">${res.aviso}</div>` : ''}
+            `;
+        }
+
+        async function guardarPeriodo() {
+            if (!txtDesde.value || !txtHasta.value) {
+                alert('Debe ingresar tanto la fecha "Desde" como la fecha "Hasta".');
+                return;
+            }
+
+            if (!ultimoCalculo || ultimoCalculo.msg !== 'ok') {
+                await calcularPeriodo();
+                if (!ultimoCalculo || ultimoCalculo.msg !== 'ok') {
+                    alert('Debe calcular correctamente antes de guardar.');
+                    return;
+                }
+            }
+            if (!confirm(`Impuesto mensual calculado: ${dinero(ultimoCalculo.precioMensual)}. ¿Desea guardar el período?`)) return;
+            let datos = {
+                accion: 'nuevo',
+                idCliente: cboClienteEmpresa.value,
+                idProducto: cboProducto.value,
+                desde: txtDesde.value,
+                hasta: txtHasta.value,
+                monto: txtMonto.value,
+                cantidad: txtCantidad.value || 1
+            };
+            let r = await fetch('/periodo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            let res = await r.json();
+            if (res.msg !== 'ok') {
+                alert('Error: ' + res.msg);
+                return;
+            }
+            limpiarPeriodo();
+            cargarPeriodos(cboClienteEmpresa.value);
+        }
+
+        async function cargarPeriodos(idCliente) {
+            if (!idCliente) { tbodyPeriodos.innerHTML = ''; return; }
+            let r = await fetch('/periodos?idCliente=' + encodeURIComponent(idCliente));
+            window.totalRef = 0;
+            window.vigenteActual = null;
+            lblTotalReferencial.textContent = dinero(0);
+            lblVigente.textContent = 'Sin período vigente';
+            let datos = await r.json();
+            tbodyPeriodos.innerHTML = '';
+            datos.forEach(p => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${(p.desde || '').substring(0,10)}</td>
+                    <td>${(p.hasta || '').substring(0,10)}</td>
+                    <td>${dinero(p.monto)}</td>
+                    <td>${p.codigoProducto ?? ''}</td>
+                    <td>${dinero(p.precioMensual)}</td>
+                    <td>${p.estado}</td>
+                    <td></td>`;
+                let btnEliminar = document.createElement('input');
+                btnEliminar.type = 'button';
+                btnEliminar.value = 'Eliminar';
+                btnEliminar.className = 'btn btn-danger btn-sm';
+                btnEliminar.addEventListener('click', () => eliminarPeriodo(p));
+                tr.lastElementChild.appendChild(btnEliminar);
+                tbodyPeriodos.appendChild(tr);
+                totalRef += Number(p.precio);
+                if (p.vigente == 1) vigenteActual = Number(p.precioMensual);
+                lblTotalReferencial.textContent = dinero(totalRef);
+                lblVigente.textContent = vigenteActual === null ? 'Sin período vigente' : dinero(vigenteActual);
+            });
+        }
+
+        async function eliminarPeriodo(p) {
+            if (!confirm('¿Eliminar el período seleccionado?')) return;
+            let r = await fetch('/periodo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accion: 'eliminar', idPeriodo: p.idPeriodo })
+            });
+            let res = await r.json();
+            if (res.msg !== 'ok') { alert('Error: ' + res.msg); return; }
+            cargarPeriodos(cboClienteEmpresa.value);
+        }
+
+        function limpiarPeriodo() {
+            ultimoCalculo = null;
+            txtDesde.value = '';
+            txtHasta.value = '';
+            txtMonto.value = '';
+            txtCantidad.value = 1;
+            detalleCalculo.innerHTML = 'Complete los datos y presione <b>Calcular</b>.';
+        }
+    </script>
+</body>
 
 </html>
