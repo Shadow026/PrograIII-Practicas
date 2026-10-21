@@ -3,11 +3,11 @@ from mysql.connector import Error
 
 
 class Conexion:
-    def __init__(self):
+    def __init__(self, database="db_sistema_impuestos"):
         self.host = "localhost"
         self.user = "root"
         self.password = ""
-        self.database = "db_sistema_impuestos"
+        self.database = database
         print("Conectando a la base de datos...")
         try:
             self.conexion = mysql.connector.connect(
