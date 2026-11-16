@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4p0+ttbuty1_jx1qr+^j(iy68i9e$cq$qy!(kptqctehcl87yb'
+SECRET_KEY = 'django-insecure-pf42b3emzjp-1rh#e#3o2w9v=5_3qsd$jqj&l6$ltu^+g@&t8='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'clientes', 'productos'
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,7 @@ ROOT_URLCONF = 'appimpuestos.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR /'appimpuestos/plantillas'],
+        'DIRS': [BASE_DIR / 'appimpuestos/plantillas'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
